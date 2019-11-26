@@ -7,25 +7,39 @@ package diagramasUML.interfazGrafica;
 import diagramasUML.clase.Atributo;
 import diagramasUML.clase.Clase;
 import diagramasUML.clase.Metodo;
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Font;
 import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
 /**
  *
  * @author josearielpereyra
  */
-public class ClaseVisual extends Rectangle {
+public class ClaseVisual extends JPanel {
   Clase claseADibujar;
   private final Color color;
   public Point puntoInicialDeArrastre;
+  int diferenciaEnX;
+  int diferenciaEnY;
+  int x;
+  int y;
+  int width;
+  int height;
+  public static LineBorder bordePredeterminado = new LineBorder(Color.GRAY);
 
   public ClaseVisual(int x, int y, String nombre) {
     setLocation(x, y);
     setSize(250, 350);
+    setLayout(new BorderLayout());
     Metodo metodo1 = new Metodo();
     Atributo atributo1 = new Atributo();
     Atributo atributo2 = new Atributo();
@@ -41,16 +55,33 @@ public class ClaseVisual extends Rectangle {
     int verde = numerosAleatorios.nextInt(56) + 200;
     int azul = numerosAleatorios.nextInt(56) + 200;
     color = new Color(rojo, verde, azul, 200);
-  }
-
-  
-  void dibujar(Graphics g) {    
-    g.setColor(color);
-    g.fillRect(x, y, width, height);
+    this.setBackground(color);
     
-    g.setColor(Color.BLACK);
-    g.drawRect(x, y, width, height);
-    g.drawString(claseADibujar.getNombre(), x + 10, y + 20);
-    g.drawLine(x, y + 30, x + width, y + 30);
+    JLabel etiquetaNombre = new JLabel( claseADibujar.getNombre());
+    etiquetaNombre.setFont(etiquetaNombre.getFont().deriveFont(Font.BOLD));
+    etiquetaNombre.setHorizontalAlignment(SwingConstants.CENTER);
+    this.add( etiquetaNombre, BorderLayout.NORTH );
+    
+    this.setBorder(bordePredeterminado);
+    
+    this.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mousePressed(MouseEvent evento) {
+        puntoInicialDeArrastre = evento.getPoint();
+      }
+      
+    });
+    
+    this.addMouseMotionListener(new MouseAdapter() {
+      @Override
+      public void mouseDragged(MouseEvent evento) {
+        Point puntoActual = evento.getPoint();
+        diferenciaEnX = puntoInicialDeArrastre.x - puntoActual.x;
+        diferenciaEnY = puntoInicialDeArrastre.y - puntoActual.y;
+        
+        Point ubicacionActual = ClaseVisual.this.getLocation();
+        ClaseVisual.this.setLocation( ubicacionActual.x - diferenciaEnX, ubicacionActual.y - diferenciaEnY);
+      }
+    });
   }
 }

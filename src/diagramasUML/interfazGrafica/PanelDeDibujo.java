@@ -5,11 +5,10 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 
 /**
  * @author josearielpereyra
@@ -29,64 +28,7 @@ public class PanelDeDibujo extends JPanel{
   int variacion = 10;
 
   public PanelDeDibujo() {
-    this.addMouseListener(new MouseAdapter() {
-      
-      @Override
-      public void mousePressed(MouseEvent e) {
-        puntoInicialDeArrastre = e.getPoint();
-        
-        for(int i = clases.size() - 1; i >= 0; i--) {
-          ClaseVisual claseActual = clases.get(i);
-          
-          if(!seDebeSeleccionarTodo) {
-            if(claseActual.contains(puntoInicialDeArrastre)) {
-              claseActiva = claseActual;
-
-              //quitar la clase y ponerla al final
-              clases.remove(claseActiva);
-              clases.add(claseActual);
-
-              diferenciaEnX = puntoInicialDeArrastre.x - claseActual.x ;
-              diferenciaEnY = puntoInicialDeArrastre.y - claseActual.y ;
-              System.out.println(claseActiva);
-              repaint();
-
-              break;
-            }
-          }
-          else {
-            claseActual.puntoInicialDeArrastre = new Point(
-                puntoInicialDeArrastre.x - claseActual.x, 
-                puntoInicialDeArrastre.y - claseActual.y
-            );
-          }
-        }
-      }      
-    });
-    
-    this.addMouseMotionListener(new MouseAdapter() {
-      @Override
-      public void mouseDragged(MouseEvent e) {
-        puntoFinal = e.getPoint();
-        if(!seDebeSeleccionarTodo) {
-          int x = puntoFinal.x - diferenciaEnX;
-          int y = puntoFinal.y - diferenciaEnY;
-          claseActiva.setLocation(new Point(x, y));
-        }
-        else {
-          for (ClaseVisual claseActual : clases) {
-            int x = puntoFinal.x - claseActual.puntoInicialDeArrastre.x;
-            int y = puntoFinal.y - claseActual.puntoInicialDeArrastre.y;
-            claseActual.setLocation(new Point(x, y));
-          }
-        }
-        
-        repaint();
-        
-        System.out.println(claseActiva);
-      }
-    });
-    
+    setLayout(null);
     this.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
@@ -144,22 +86,6 @@ public class PanelDeDibujo extends JPanel{
     }
     
     mostrarNumeros(g);
-    
-    for (ClaseVisual clase : clases) {
-      g.setColor(Color.black);
-      clase.dibujar(g);
-      
-      if(clase.equals(claseActiva)) {
-        g.setColor(Color.RED);
-
-        g.drawRect(clase.x, clase.y, clase.width, clase.height);
-        g.drawRect(clase.x-1, clase.y-1, clase.width + 2, clase.height + 2);
-        g.setColor(Color.black);
-        g.drawRect(clase.x-2, clase.y-2, clase.width  + 4, clase.height + 4);
-      }
-    }
-    
-    this.requestFocusInWindow();
   }
   
   public void mostrarCuadricula(boolean seDebeMostrar) {
@@ -201,8 +127,17 @@ public class PanelDeDibujo extends JPanel{
     Random numerosAleatorios = new Random();
     int x = numerosAleatorios.nextInt(100);
     int y = numerosAleatorios.nextInt(30);
+    
+    
+    if(claseActiva != null) {
+      claseActiva.setBorder(ClaseVisual.bordePredeterminado);
+    }
     claseActiva = new ClaseVisual(x, y, "Persona " + ++numeroDeClase);
+    claseActiva.setBorder(new LineBorder(Color.RED, 3));
     clases.add( claseActiva );
+    this.add( claseActiva );
+    
+    claseActiva.validate();
     repaint();
   }
 }
