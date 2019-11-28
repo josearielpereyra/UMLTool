@@ -8,7 +8,6 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
 
 /**
  * @author josearielpereyra
@@ -78,8 +77,8 @@ public class PanelDeDibujo extends JPanel{
 
   @Override
   protected void paintComponent(Graphics g) {
-    super.paintComponent(g); 
-   
+    super.paintComponent(g);
+    
     if(cuadriculaVisible) {
       dibujarLineasHorizontales(g);
       dibujarLineasVerticales(g);
@@ -128,16 +127,9 @@ public class PanelDeDibujo extends JPanel{
     int x = numerosAleatorios.nextInt(100);
     int y = numerosAleatorios.nextInt(30);
     
-    
-    if(claseActiva != null) {
-      claseActiva.setBorder(ClaseVisual.bordePredeterminado);
-    }
-    claseActiva = new ClaseVisual(x, y, "Persona " + ++numeroDeClase);
-    claseActiva.setBorder(new LineBorder(Color.RED, 3));
-    clases.add( claseActiva );
-    this.add( claseActiva );
-    
-    claseActiva.validate();
+    ClaseVisual claseActual = new ClaseVisual(x, y, "Persona " + ++numeroDeClase);
+    this.add( claseActual );
+    claseActual.validate();
     repaint();
   }
 }

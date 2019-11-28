@@ -10,7 +10,9 @@ import diagramasUML.clase.Metodo;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -34,9 +36,13 @@ public class ClaseVisual extends JPanel {
   int y;
   int width;
   int height;
-  public static LineBorder bordePredeterminado = new LineBorder(Color.GRAY);
+  public static LineBorder bordePredeterminado = new LineBorder( Color.GRAY );
+  public static ClaseVisual claseActiva;
+  private final JPanel panelAtributos;
+  private final JPanel panelMetodos;
 
   public ClaseVisual(int x, int y, String nombre) {
+    setOpaque(false);
     setLocation(x, y);
     setSize(250, 350);
     setLayout(new BorderLayout());
@@ -60,7 +66,16 @@ public class ClaseVisual extends JPanel {
     JLabel etiquetaNombre = new JLabel( claseADibujar.getNombre());
     etiquetaNombre.setFont(etiquetaNombre.getFont().deriveFont(Font.BOLD));
     etiquetaNombre.setHorizontalAlignment(SwingConstants.CENTER);
+    etiquetaNombre.setBorder(bordePredeterminado);
+    panelAtributos = new JPanel();
+    panelAtributos.setBorder(bordePredeterminado);
+    panelAtributos.setOpaque(false);
+    panelMetodos = new JPanel();
+    panelMetodos.setBorder(bordePredeterminado);
+    panelMetodos.setOpaque(false);
     this.add( etiquetaNombre, BorderLayout.NORTH );
+    this.add(panelAtributos, BorderLayout.CENTER);
+    this.add(panelMetodos, BorderLayout.SOUTH);
     
     this.setBorder(bordePredeterminado);
     
@@ -68,6 +83,7 @@ public class ClaseVisual extends JPanel {
       @Override
       public void mousePressed(MouseEvent evento) {
         puntoInicialDeArrastre = evento.getPoint();
+        actualizarClaseActiva();
       }
       
     });
@@ -83,5 +99,23 @@ public class ClaseVisual extends JPanel {
         ClaseVisual.this.setLocation( ubicacionActual.x - diferenciaEnX, ubicacionActual.y - diferenciaEnY);
       }
     });
+    
+    actualizarClaseActiva();
+  }
+
+  private void actualizarClaseActiva() {
+    if(ClaseVisual.claseActiva != null) {
+      claseActiva.setBorder(ClaseVisual.bordePredeterminado);
+    }
+    ClaseVisual.claseActiva = this;
+    this.setBorder(new LineBorder(Color.RED, 3));
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    g.setColor( color );
+    Rectangle r = g.getClipBounds();
+    g.fillRect(r.x, r.y, r.width, r.height);
+    super.paintComponent(g);
   }
 }
