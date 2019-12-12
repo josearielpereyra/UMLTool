@@ -7,12 +7,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
 /**
  * @author josearielpereyra
  */
-public class PanelDeDibujo extends JPanel{
+public class PanelDeDibujo extends JLayeredPane{
   ArrayList<ClaseVisual> clases = new ArrayList<>();
   boolean cuadriculaVisible = false;
   boolean seDebeSeleccionarTodo = false;
@@ -21,13 +22,10 @@ public class PanelDeDibujo extends JPanel{
   ArrayList<Point> puntosInicialesDeArrastre = new ArrayList<>();
   Point puntoFinal;
   ClaseVisual claseActiva;
-  private int diferenciaEnX;
-  private int diferenciaEnY;
   private int numeroDeClase;
   int variacion = 10;
 
   public PanelDeDibujo() {
-    setLayout(null);
     this.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
@@ -123,12 +121,14 @@ public class PanelDeDibujo extends JPanel{
   }
   
   public void agregarClase() {
+    ClaseVisual.contenedor = this;  
     Random numerosAleatorios = new Random();
     int x = numerosAleatorios.nextInt(100);
     int y = numerosAleatorios.nextInt(30);
     
     ClaseVisual claseActual = new ClaseVisual(x, y, "Persona " + ++numeroDeClase);
     this.add( claseActual );
+    claseActual.actualizarClaseActiva();
     claseActual.validate();
     repaint();
   }
