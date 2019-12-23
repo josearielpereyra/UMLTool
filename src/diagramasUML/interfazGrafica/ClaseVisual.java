@@ -9,6 +9,7 @@ import diagramasUML.clase.Clase;
 import diagramasUML.clase.Metodo;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -18,6 +19,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
@@ -27,6 +29,7 @@ import javax.swing.border.LineBorder;
  * @author josearielpereyra
  */
 public class ClaseVisual extends JPanel {
+  static PanelDeDibujo contenedor;
   Clase claseADibujar;
   private final Color color;
   public Point puntoInicialDeArrastre;
@@ -103,12 +106,17 @@ public class ClaseVisual extends JPanel {
     actualizarClaseActiva();
   }
 
-  private void actualizarClaseActiva() {
-    if(ClaseVisual.claseActiva != null) {
+  protected void actualizarClaseActiva() {
+    if( claseActiva != null ) {
       claseActiva.setBorder(ClaseVisual.bordePredeterminado);
     }
-    ClaseVisual.claseActiva = this;
+    
     this.setBorder(new LineBorder(Color.RED, 3));
+    claseActiva = this;
+    
+    if(contenedor != null) {
+        contenedor.moveToFront(claseActiva);
+    }
   }
 
   @Override

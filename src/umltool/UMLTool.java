@@ -1,7 +1,6 @@
 package umltool;
 
 import diagramasUML.interfazGrafica.PanelDeDibujo;
-import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.DefaultCellEditor;
@@ -41,7 +40,7 @@ public class UMLTool {
     ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     ventana.setExtendedState(JFrame.MAXIMIZED_BOTH);
     PanelDeDibujo panel = new PanelDeDibujo();
-    ventana.add(panel, BorderLayout.CENTER);
+    ventana.setContentPane(panel);
     
     JMenuBar barraDeMenu = new JMenuBar();
     JMenu menuArchivo = new JMenu("Archivo");
