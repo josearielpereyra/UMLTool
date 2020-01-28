@@ -71,6 +71,11 @@ public class PanelDeDibujo extends JLayeredPane{
         variacion = 10;
       }
     });
+    
+    
+    agregarClase();
+    agregarClase();
+    agregarClase();
   }
 
   @Override

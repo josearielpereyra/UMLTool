@@ -10,6 +10,7 @@ import diagramasUML.clase.Metodo;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -33,8 +34,8 @@ public class ClaseVisual extends JPanel {
   Clase claseADibujar;
   private final Color color;
   public Point puntoInicialDeArrastre;
-  int diferenciaEnX;
-  int diferenciaEnY;
+  int diferenciaEnXParaArrastre;
+  int diferenciaEnYParaArrastre;
   int x;
   int y;
   int width;
@@ -43,6 +44,8 @@ public class ClaseVisual extends JPanel {
   public static ClaseVisual claseActiva;
   private final JPanel panelAtributos;
   private final JPanel panelMetodos;
+  private final int PRECISION = 5;
+  private int tipoDeCursorInicial;
 
   public ClaseVisual(int x, int y, String nombre) {
     setOpaque(false);
@@ -85,9 +88,16 @@ public class ClaseVisual extends JPanel {
     this.addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(MouseEvent evento) {
+        tipoDeCursorInicial = getCursor().getType();
         puntoInicialDeArrastre = evento.getPoint();
         actualizarClaseActiva();
       }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+          tipoDeCursorInicial = Cursor.DEFAULT_CURSOR;
+        }
+      
       
     });
     
@@ -95,12 +105,91 @@ public class ClaseVisual extends JPanel {
       @Override
       public void mouseDragged(MouseEvent evento) {
         Point puntoActual = evento.getPoint();
-        diferenciaEnX = puntoInicialDeArrastre.x - puntoActual.x;
-        diferenciaEnY = puntoInicialDeArrastre.y - puntoActual.y;
+        diferenciaEnXParaArrastre = puntoInicialDeArrastre.x - puntoActual.x;
+        diferenciaEnYParaArrastre = puntoInicialDeArrastre.y - puntoActual.y;
         
         Point ubicacionActual = ClaseVisual.this.getLocation();
-        ClaseVisual.this.setLocation( ubicacionActual.x - diferenciaEnX, ubicacionActual.y - diferenciaEnY);
+        
+        int diferenciaEnXParaRedimensionamiento = puntoActual.x - getWidth();
+        int diferenciaEnYParaRedimensionamiento = puntoActual.y - getHeight();
+        int nuevaAnchura = getWidth() + diferenciaEnXParaRedimensionamiento;
+        int nuevaAltura = getHeight() + diferenciaEnYParaRedimensionamiento;
+        int anchuraMinima = 100;
+        int alturaMinima = 100;
+        
+        int tipoDeCursor = getCursor().getType();
+        if(tipoDeCursor == Cursor.DEFAULT_CURSOR) {
+            ClaseVisual.this.setLocation(ubicacionActual.x - diferenciaEnXParaArrastre, ubicacionActual.y - diferenciaEnYParaArrastre);
+        }
+        else if(tipoDeCursor == Cursor.E_RESIZE_CURSOR ) {
+            if( getWidth() > anchuraMinima ) {
+                nuevaAnchura += diferenciaEnXParaRedimensionamiento > 0 ? 3 : -3;
+                ClaseVisual.this.setSize(nuevaAnchura, getHeight());
+            }
+        }
+        else if(tipoDeCursor == Cursor.SE_RESIZE_CURSOR) {
+            if(getWidth() >= anchuraMinima) {
+                nuevaAnchura += diferenciaEnXParaRedimensionamiento > 0 ? 3 : -3;
+            }
+            else {
+               nuevaAnchura = anchuraMinima;
+            }
+            
+            
+            if( getHeight() >= alturaMinima ) {
+                nuevaAltura += diferenciaEnYParaRedimensionamiento > 0 ? 3 : -3;
+            }
+            else {
+                nuevaAltura = alturaMinima;
+            }
+            ClaseVisual.this.setSize(nuevaAnchura, nuevaAltura);
+        }
+        else if(tipoDeCursor == Cursor.S_RESIZE_CURSOR ) {
+            if( getHeight() > alturaMinima ) {
+                nuevaAltura += diferenciaEnYParaRedimensionamiento > 0 ? 3 : -3;
+                ClaseVisual.this.setSize(getWidth(), nuevaAltura);
+            }
+        }
+        revalidate();
       }
+
+        @Override
+        public void mouseMoved(MouseEvent evento) {
+            Point punto = evento.getPoint();
+            int tipoDeCursor = Cursor.DEFAULT_CURSOR;
+            
+            if(tipoDeCursorInicial != Cursor.DEFAULT_CURSOR) {
+                tipoDeCursor = tipoDeCursorInicial;
+            }
+                
+            if(punto.x <= PRECISION && punto.y <= PRECISION) {
+                tipoDeCursor = Cursor.NW_RESIZE_CURSOR;
+            }
+            else if(punto.x <= PRECISION && punto.y >= getHeight() - PRECISION) {
+                tipoDeCursor = Cursor.SW_RESIZE_CURSOR;
+            }
+            else if(punto.x >= getWidth() - PRECISION && punto.y <= PRECISION) {
+                tipoDeCursor = Cursor.NE_RESIZE_CURSOR;
+            }
+            else if (punto.x >= getWidth() - PRECISION && punto.y >= getHeight() - PRECISION) {
+                tipoDeCursor = Cursor.SE_RESIZE_CURSOR;
+            }
+            else if(punto.x <= PRECISION ) {
+                tipoDeCursor = Cursor.W_RESIZE_CURSOR;
+            }
+            else if( punto.x >= getWidth() - PRECISION ) {
+                tipoDeCursor = Cursor.E_RESIZE_CURSOR;   
+            }
+            else if( punto.y <= PRECISION ) {
+                tipoDeCursor = Cursor.N_RESIZE_CURSOR;   
+            }
+            else if( punto.y >= getHeight() - PRECISION ) {
+                tipoDeCursor = Cursor.S_RESIZE_CURSOR;   
+            }
+            
+            setCursor( new Cursor( tipoDeCursor ) );
+        }
+        
     });
     
     actualizarClaseActiva();
